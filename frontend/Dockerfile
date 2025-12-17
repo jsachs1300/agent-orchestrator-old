@@ -3,11 +3,11 @@ FROM node:20-slim AS build
 WORKDIR /app
 
 # Copy package files and install dependencies
-COPY frontend/package*.json ./
+COPY package*.json ./
 RUN npm ci --prefer-offline --no-audit
 
 # Copy source files
-COPY frontend/ .
+COPY . .
 
 # Build-time API target for the frontend
 ARG VITE_API_BASE_URL=""
@@ -22,7 +22,7 @@ FROM nginx:1.27-alpine
 
 # Cloud Run expects the container to listen on $PORT (default 8080)
 RUN rm /etc/nginx/conf.d/default.conf
-COPY frontend/nginx.conf /etc/nginx/conf.d/default.conf
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /app/dist /usr/share/nginx/html
 
 # Add healthcheck endpoint

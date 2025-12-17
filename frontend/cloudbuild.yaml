@@ -7,7 +7,7 @@ steps:
         "-t",
         "gcr.io/$PROJECT_ID/agent-orchestrator-frontend",
         "-f",
-        "frontend/Dockerfile",
+        "Dockerfile",
         "--build-arg",
         "VITE_API_BASE_URL=$_API_BASE_URL",
         "."
