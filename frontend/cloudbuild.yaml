@@ -1,14 +1,4 @@
 steps:
-  - name: gcr.io/cloud-builders/npm
-    id: install-dependencies
-    args: ["ci"]
-    dir: frontend
-
-  - name: gcr.io/cloud-builders/npm
-    id: build-frontend
-    args: ["run", "build"]
-    dir: frontend
-
   - name: gcr.io/cloud-builders/docker
     id: build-image
     args:
@@ -41,11 +31,21 @@ steps:
         "$_REGION",
         "--platform",
         "managed",
-        "--allow-unauthenticated"
+        "--allow-unauthenticated",
+        "--port",
+        "8080",
+        "--memory",
+        "512Mi",
+        "--cpu",
+        "1"
       ]
 
 images:
   - gcr.io/$PROJECT_ID/agent-orchestrator-frontend
+
+options:
+  machineType: E2_HIGHCPU_8
+  logging: CLOUD_LOGGING_ONLY
 
 timeout: 1200s
 substitutions:
