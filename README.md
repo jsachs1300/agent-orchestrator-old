@@ -46,6 +46,35 @@ The repository includes a Vite + React playground for calling the `/plan` endpoi
 
 #### Deploying the playground to Google Cloud Run
 
+##### Option 1: Using Cloud Build (Recommended)
+
+The frontend includes a `cloudbuild.yaml` that automatically discovers the backend URL from your deployed Cloud Run service.
+
+1. **Configure your Cloud Build trigger** with the following substitution variables:
+
+   In the GCP Console (Cloud Build → Triggers → Edit Trigger → Advanced → Substitution variables):
+   - `_BACKEND_SERVICE_NAME`: `agent-orchestrator` (or your backend service name)
+   - `_BACKEND_REGION`: `us-central1` (or your backend region)
+
+   Or via gcloud:
+   ```bash
+   gcloud builds triggers create github \
+     --repo-name=agent-orchestrator \
+     --repo-owner=YOUR_GITHUB_ORG \
+     --branch-pattern=^main$ \
+     --build-config=frontend/cloudbuild.yaml \
+     --substitutions=_BACKEND_SERVICE_NAME=agent-orchestrator,_BACKEND_REGION=us-central1,_SERVICE_NAME=agent-frontend,_REGION=us-central1
+   ```
+
+2. **Trigger the build** or push to your configured branch. The build will:
+   - Query your backend Cloud Run service URL automatically
+   - Build the frontend with `VITE_API_BASE_URL` set to the backend URL
+   - Deploy to Cloud Run
+
+3. Visit the deployed frontend URL to use the playground.
+
+##### Option 2: Manual Docker build
+
 1. Build the static bundle and container image using the provided `frontend/Dockerfile`. Pass the backend base URL for the
    playground at build time so Vite can inline it:
 

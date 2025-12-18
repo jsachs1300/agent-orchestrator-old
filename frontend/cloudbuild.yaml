@@ -1,17 +1,29 @@
 steps:
+  # Query the backend Cloud Run service URL
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk
+    id: get-backend-url
+    entrypoint: bash
+    args:
+      - '-c'
+      - |
+        gcloud run services describe $_BACKEND_SERVICE_NAME \
+          --region=$_BACKEND_REGION \
+          --format='value(status.url)' > /workspace/backend-url.txt
+
+  # Build with the backend URL
   - name: gcr.io/cloud-builders/docker
     id: build-image
+    entrypoint: bash
     args:
-      [
-        "build",
-        "-t",
-        "gcr.io/$PROJECT_ID/agent-orchestrator-frontend",
-        "-f",
-        "Dockerfile",
-        "--build-arg",
-        "VITE_API_BASE_URL=$_API_BASE_URL",
-        "."
-      ]
+      - '-c'
+      - |
+        API_URL=$(cat /workspace/backend-url.txt)
+        echo "Building with VITE_API_BASE_URL=$API_URL"
+        docker build \
+          -t gcr.io/$PROJECT_ID/agent-orchestrator-frontend \
+          -f Dockerfile \
+          --build-arg VITE_API_BASE_URL=$API_URL \
+          .
 
   - name: gcr.io/cloud-builders/docker
     id: push-image
@@ -51,4 +63,6 @@ timeout: 1200s
 substitutions:
   _SERVICE_NAME: agent-orchestrator-frontend
   _REGION: us-central1
-  _API_BASE_URL: ""
+  # Configure these in your Cloud Build trigger:
+  # _BACKEND_SERVICE_NAME: agent-orchestrator
+  # _BACKEND_REGION: us-central1
