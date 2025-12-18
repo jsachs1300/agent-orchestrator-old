@@ -5,6 +5,7 @@ import bodyParser from "body-parser";
 import sessionsRouter from "./routes/sessions";
 import authRouter from "./routes/auth";
 import toolsRouter from "./routes/tools";
+import planRouter from "./routes/plan";
 import { initRedisClient } from "../core/redis-client";
 
 export function createApp() {
@@ -19,6 +20,7 @@ export function createApp() {
   app.use("/sessions", sessionsRouter);
   app.use("/auth", authRouter);
   app.use("/tools", toolsRouter);
+  app.use("/plan", planRouter);
 
   initRedisClient();
 
