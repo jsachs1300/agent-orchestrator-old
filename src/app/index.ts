@@ -6,6 +6,7 @@ import sessionsRouter from "./routes/sessions";
 import authRouter from "./routes/auth";
 import toolsRouter from "./routes/tools";
 import planRouter from "./routes/plan";
+import requirementsRouter from "./routes/v1/requirements";
 import { initRedisClient } from "../core/redis-client";
 
 export function createApp() {
@@ -21,6 +22,7 @@ export function createApp() {
   app.use("/auth", authRouter);
   app.use("/tools", toolsRouter);
   app.use("/plan", planRouter);
+  app.use("/v1/requirements", requirementsRouter);
 
   initRedisClient();
 
